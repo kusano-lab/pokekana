@@ -1,25 +1,33 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Quiz from './quiz/index.js';
+import { BrowserRouter as Router ,Switch, Route, Link} from 'react-router-dom';
 
 function App() {
   return (
+    <Router>
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>PokeKana</p>
+        <nav>
+          <ul>
+            <li><Link to="/">ほーむ</Link></li>
+            <li><Link to="/quiz">くいず</Link></li>
+          </ul>
+        </nav>
       </header>
+      <hr />
+      <div id="main">
+      <Switch>
+        <Route path="/quiz">
+          <Quiz />
+        </Route>
+        <Route path="/">
+          <p>TOP page!</p>
+        </Route>
+      </Switch>
+      </div>
     </div>
+    </Router>
   );
 }
 
