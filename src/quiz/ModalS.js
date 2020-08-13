@@ -1,8 +1,19 @@
-import React from 'react'
-import {getRandomInt, kata2hira} from '../utils/index'
+import React, {useContext} from 'react'
+import {PokemonContext} from './index'
+import {getRandomInt} from '../utils/index'
+import { v4 as uuid } from 'uuid'
 
-const ModalS = (props) => {
-    const {zukan, charCode, randomNum, pokemon, n} = props.props;
+const ModalS = () => {
+    let props = useContext(PokemonContext)
+    let {zukan} = props;
+    let nextQuizBtns = []
+    while(nextQuizBtns.length < 5){
+        let getPokemon = zukan[getRandomInt(zukan.length)]
+        //ポケモンの重複なく取得する
+        if( !nextQuizBtns.some(addedPokemon => (addedPokemon.name === getPokemon.name)) ){
+            nextQuizBtns.push(getPokemon)
+        }
+    }
 
     // const setNextBtnHandler = () => {
     //     let nextQuizBtns = nextQuizBtnWrap.querySelectorAll('li img[data-id^="item"]');
@@ -22,17 +33,31 @@ const ModalS = (props) => {
     //     })
     // }
 
+    const nextQuizHandler = (elem) => {
+        console.log(elem.target) // <img data-id="item013" src="/img/pokemon/item013.png" alt="ビードール">
+
+        //再描写の処理を追加する
+        // modal.classList = '' // 答えの状態を初期化
+        // quizSetting(i) // 画面の再描写
+    }
 
 
     return (
         <div id="modal-s">
             <ul>
-                <li><img data-id="item001" src="/img/pokemon/item001.png" alt="フシキダネ" /></li>
-                <li><img data-id="item005" src="/img/pokemon/item005.png" alt="リザード" /></li>
-                <li><img data-id="item010" src="/img/pokemon/item010.png" alt="キャタピー" /></li>
-                <li><img data-id="item016" src="/img/pokemon/item016.png" alt="ポッポ" /></li>
-                <li><img data-id="item020" src="/img/pokemon/item020.png" alt="ラッタ" /></li>
-                <li><img data-id="item020" src="/img/pokemon/item020.png" alt="ラッタ" /></li>
+                {
+                    nextQuizBtns.map(pokemon => {
+                        return(
+                            <li key={uuid()}>
+                                <img
+                                    data-id={pokemon.id}
+                                    src={`/img/pokemon/${pokemon.id}.png`}
+                                    alt={pokemon.name}
+                                    onClick={nextQuizHandler} />
+                            </li>
+                        )
+                    })
+                }
             </ul>
         </div>
     )
