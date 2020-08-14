@@ -1,7 +1,11 @@
 import React from 'react'
 import {getRandomInt, hira2kata, kata2hira, shuffle, createAnswerWords} from '../utils/index'
 import { v4 as uuid } from 'uuid'
+import {Howl} from 'howler';
 
+const sound = new Howl({
+    src: ['/mp3/correct.mp3']
+});
 
 const ModalA = (props) => {
     const {zukan, charCode, randomNum, pokemon, n} = props.props;
@@ -21,10 +25,12 @@ const ModalA = (props) => {
     const answerHandler = (elem) => {
         let modal = document.getElementById('modal');
         let answerState = parseInt(elem.target.getAttribute('data-a'), 10)
-        if(answerState == 1){
-            // sound.play()
-            modal.classList.add('correct')
-            modal.classList.remove('wrong')
+        if(answerState === 1){
+            sound.play()
+            setData({
+                ...useData,
+                quizState: 'correct'
+            })
         }else{
             // 不正解から別の不正解を選択した場合に、値が変更されたことがわかりやすいようにする
             let isWrong = modal.classList.contains('wrong');
