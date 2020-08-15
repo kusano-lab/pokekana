@@ -1,10 +1,12 @@
-import React from 'react'
+import React, {useContext} from 'react'
+import {PokemonContext} from './index'
 import {kata2hira} from '../utils/index'
 import { v4 as uuid } from 'uuid'
 
 
-const ModalQ = (props) => {
-    const {zukan, charCode, randomNum, pokemon, n} = props.props;
+const ModalQ = () => {
+    let [useData] = useContext(PokemonContext)
+    let {charCode, pokemon, n} = useData;
 
     return (
     <div id="modal-q">
@@ -13,7 +15,7 @@ const ModalQ = (props) => {
             {
                 [...pokemon.name].map((char, i) => {
                     return (
-                        <span data-a={(n == i) ? 1: 0}  key={uuid()}>
+                        <span data-a={(n === i) ? 1: 0}  key={uuid()}>
                             {charCode ? kata2hira(char) : char}
                         </span>
                     )

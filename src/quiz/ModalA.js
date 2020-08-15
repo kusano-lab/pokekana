@@ -1,5 +1,6 @@
-import React from 'react'
-import {getRandomInt, hira2kata, kata2hira, shuffle, createAnswerWords} from '../utils/index'
+import React, {useContext} from 'react'
+import {PokemonContext} from './index'
+import {hira2kata, kata2hira} from '../utils/index'
 import { v4 as uuid } from 'uuid'
 import {Howl} from 'howler';
 
@@ -7,23 +8,11 @@ const sound = new Howl({
     src: ['/mp3/correct.mp3']
 });
 
-const ModalA = (props) => {
-    const {zukan, charCode, randomNum, pokemon, n} = props.props;
-
-    let correctWord = kata2hira([...pokemon.name][n]);
-    console.log('correctWord1', correctWord)
-    // 特定の文字を除外する
-    while(correctWord == 'ー'){
-        n = getRandomInt([...pokemon.name].length)
-        console.log('correctWord2', correctWord)
-        correctWord= kata2hira([...pokemon.name][n])
-    }
-
-    let answerWords = shuffle(createAnswerWords(correctWord));
-
+const ModalA = () => {
+    let [useData, setData] = useContext(PokemonContext)
+    let {charCode, pokemon, n, correctWord, answerWords} = useData;
 
     const answerHandler = (elem) => {
-        let modal = document.getElementById('modal');
         let answerState = parseInt(elem.target.getAttribute('data-a'), 10)
         if(answerState === 1){
             sound.play()
@@ -33,15 +22,22 @@ const ModalA = (props) => {
             })
         }else{
             // 不正解から別の不正解を選択した場合に、値が変更されたことがわかりやすいようにする
-            let isWrong = modal.classList.contains('wrong');
-            if(isWrong){
-                modal.classList.remove('wrong')
+            if(useData.quizState === 'wrong'){
+                setData({
+                    ...useData,
+                    quizState: ''
+                })
                 setTimeout(() => {
-                    modal.classList.add('wrong')
+                    setData({
+                        ...useData,
+                        quizState: 'wrong'
+                    })
                 }, 200)
             }else{
-                modal.classList.add('wrong')
-                modal.classList.remove('correct')
+                setData({
+                    ...useData,
+                    quizState: 'wrong'
+                })
             }
         }
     }
@@ -53,7 +49,7 @@ const ModalA = (props) => {
                 {
                     [...pokemon.name].map((char, i) => {
                         return (
-                            <span data-a={(n == i) ? 1: 0} key={uuid()}>
+                            <span data-a={(n === i) ? 1: 0} key={uuid()}>
                                 {charCode ? char : kata2hira(char)}
                             </span>
                         )
@@ -69,13 +65,20 @@ const ModalA = (props) => {
                             setWord = hira2kata(char)
                         }else {
                             // Q: カタカナ, A: ひらがな（どこかでcharCodeの切り替え処理をまとめる）
-                            setWord = (char == correctWord) ? char: kata2hira(char)
+                            setWord = (char === correctWord) ? char: kata2hira(char)
                         }
-                        let checkCorrect = (char == correctWord) ? 1: 0
+                        let checkCorrect = (char === correctWord) ? 1: 0
                         return (
                             <li key={uuid()}>
-                                <input type="radio" value={setWord} id={`word-choise-${i}`} name="word-choise-radio" />
-                                <label data-a={checkCorrect} htmlFor={`word-choise-${i}`} onClick={(elem) => {answerHandler(elem)}}>{setWord}</label>
+                                <input
+                                    type="radio"
+                                    value={setWord}
+                                    id={`word-choise-${i}`}
+                                    name="word-choise-radio" />
+                                <label
+                                    data-a={checkCorrect}
+                                    htmlFor={`word-choise-${i}`}
+                                    onClick={(elem) => {answerHandler(elem)}} >{setWord}</label>
                             </li>
                         )
                     })
